@@ -1,0 +1,24 @@
+Potential improvements
+    how do we do dividends? and adj close...?
+    Simulation module
+    
+    report buy_power in report and/or log
+    Datetime logging
+    Undo transaction in portfolio
+    Safeguard for overwrite of portfolio
+    sortable portfolio history (overall portfolio split amongst trading strategies)
+    show current value of each equity inside report
+    A way to print out analysis filtered by portfolio components
+    Overload stock + and -
+    
+     Update Market Context.
+         Include latest value for stock.
+
+In Progress
+    rate of return calculations
+    Creating history object (move rounding to transaction)
+    
+Completed Work
+    Fix floating point arithmetic issues
+    Allow user to do buys and sells by total price instead of avg cost per share
+    Sort Reporting by total current value
