@@ -10,15 +10,22 @@ Potential improvements
     show current value of each equity inside report
     A way to print out analysis filtered by portfolio components
     Overload stock + and -
-    
+    Dynamically create and update "ticker.csv"
      Update Market Context.
          Include latest value for stock.
 
 In Progress
     rate of return calculations
-    Creating history object (move rounding to transaction)
+    
     
 Completed Work
     Fix floating point arithmetic issues
     Allow user to do buys and sells by total price instead of avg cost per share
     Sort Reporting by total current value
+    Creating history object (move rounding to transaction)
+    
+    
+    
+    
+    
+Re-upload portfolio

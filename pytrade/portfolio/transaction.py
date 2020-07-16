@@ -11,6 +11,9 @@ class Transaction:
         self.date = date
         self.type = transaction_type # Transaction Type
 
+    def get_value(self):
+        raise NotImplementedError("Not implemented in base class") # defined in child class
+
     def __str__(self):
         raise NotImplementedError("Not implemented in base class") # defined in child class
 
@@ -22,6 +25,9 @@ class StockTransaction(Transaction):
         Transaction.__init__(self, date, transaction_type)
         self.stock = stock
 
+    def get_value(self):
+        return 0
+
     def __str__(self):
         return f"{self.type.name} {self.date} {self.stock.ticker} {self.stock.num_shares} for {round(self.stock.num_shares * self.stock.avg_cost, 3)}"
 
@@ -32,6 +38,9 @@ class DepositTransaction(Transaction):
         Transaction.__init__(self, date, transaction_type)
         self.value = value
 
+    def get_value(self):
+        return self.value
+
     def __str__(self):
         return f"{self.type.name} {self.date} {self.value}"
     
@@ -41,5 +50,3 @@ class DepositTransaction(Transaction):
 #         Transaction.__init__(self, fname, lname)
 #         self.stock
 #         self.value
-
-print(object)

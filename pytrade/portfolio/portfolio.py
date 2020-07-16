@@ -1,7 +1,8 @@
 from .stock import Stock
-from .transaction import *
+from .transaction import DepositTransaction, StockTransaction, TransactionType
 import pickle
 from datetime import date
+import scipy.optimize as opt
 
 def autosave(func):
     def save_wrapper(self, *args, **kwargs):
@@ -78,8 +79,18 @@ class Portfolio:
             stock_value = stock_value + price * s.num_shares
         return round(stock_value + self.buy_power, 3)
 
+    def calc_rate_of_return(self):
+        return opt.fsolve(lambda rate: self.value_diff(rate), 1)[0]
+    
+    def value_diff(self, rate):
+        value = 0
+        for trans in self.history:
+            value = value + trans.get_value() * (rate ** ((date.today() - trans.date).days / 365))
+        return value - self.current_value()
+
     def report(self):
         print(f"Current Value = {self.current_value()}")
+        print(f"Buy Power = {round(self.buy_power, 3)}")
         print("-" * 30)
         self.stocks.sort(key = lambda x : x.num_shares * self.context[x.ticker].iloc[-1], reverse = True)
         for s in self.stocks:
