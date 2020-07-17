@@ -3,6 +3,7 @@ from .transaction import DepositTransaction, StockTransaction, TransactionType
 import pickle
 from datetime import date
 import scipy.optimize as opt
+import pandas as pd
 
 def autosave(func):
     def save_wrapper(self, *args, **kwargs):
@@ -18,20 +19,20 @@ class Portfolio:
         self.name = name   # P
         self.buy_power = 0
         self.stocks = [] # List of Stocks
-        self.context = data # Data
+        self.context = data # DataFrame
         self.autosave = False
         self.logging = True
         self.history = [] # List of Transactions
 
     @autosave
-    def deposit(self, value, trans_date = date.today()):
+    def deposit(self, value, trans_date=date.today()):
         self.buy_power += value
         transaction = DepositTransaction(trans_date, TransactionType.DEPOSIT, value)
         self.history.append(transaction)
         self.log(transaction)
 
     @autosave
-    def buy(self, ticker, num_shares, total_cost, trans_date = date.today()):
+    def buy(self, ticker, num_shares, total_cost, trans_date=date.today()):
         stock_in_portfolio = next((s for s in self.stocks if s.ticker == ticker), None)
 
         if round(self.buy_power - total_cost, 3) >= 0 :
@@ -51,10 +52,9 @@ class Portfolio:
         transaction = StockTransaction(trans_date, TransactionType.BUY, new_stock)
         self.history.append(transaction)
         self.log(transaction)
-        # self.log("BUY ", f"{trans_date} {ticker} {num_shares} for {round(total_cost, 3)}")
        
     @autosave
-    def sell(self, ticker, num_shares, total_price, trans_date = date.today()):
+    def sell(self, ticker, num_shares, total_price, trans_date=date.today()):
         stock_to_sell = next((s for s in self.stocks if s.ticker == ticker), None)
         if stock_to_sell is not None:
             if stock_to_sell.num_shares - num_shares >= 0:
@@ -79,15 +79,24 @@ class Portfolio:
             stock_value = stock_value + price * s.num_shares
         return round(stock_value + self.buy_power, 3)
 
+    def market_current_value(self, index="^GSPC"):
+        market_shares = 0
+        for trans in self.history:
+            market_shares = market_shares + trans.get_value() / self.context[index][trans.date]
+        return market_shares * self.context[index][date.today()]
+
     def calc_rate_of_return(self):
         return opt.fsolve(lambda rate: self.value_diff(rate), 1)[0]
     
-    def value_diff(self, rate):
+    def calc_market_rate_of_return(self, index="^GSPC"):
+        return opt.fsolve(lambda rate: self.value_diff(rate, index), 1)[0]
+
+    def value_diff(self, rate, index=None):
         value = 0
         for trans in self.history:
             value = value + trans.get_value() * (rate ** ((date.today() - trans.date).days / 365))
-        return value - self.current_value()
-
+        return value - (self.current_value() if index is None else self.market_current_value(index))
+    
     def report(self):
         print(f"Current Value = {self.current_value()}")
         print(f"Buy Power = {round(self.buy_power, 3)}")
@@ -109,7 +118,7 @@ class Portfolio:
                 logfile.write(f"{transaction}{nl}")
 
     @staticmethod
-    def load(name, context = None):
+    def load(name, context=None):
         filename = f"{name}.pkl"
         with open(filename, 'rb') as objfile:
             portfolio =  pickle.load(objfile)
