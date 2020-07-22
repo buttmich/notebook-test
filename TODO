@@ -1,5 +1,6 @@
 Potential improvements
     how do we do dividends? and adj close...? (probably involves context objectification)
+    Find way to only get 2y of dividends
     Include latest value for stock (Michael)
     Simulation module
     
@@ -14,9 +15,15 @@ Potential improvements
     
     Dynamically create and update "ticker.csv"
     
+    7 day rolling average addition to analysis
+    separate/restore previous versions of analysis
+    
+    Realized/Unrealized gains
+    Tax handling
+    
 
 In Progress
-    rate of return calculations
+    
     
     
 Completed Work
@@ -26,3 +33,4 @@ Completed Work
     Creating history object (move rounding to transaction)
     Datetime logging
     show current value of each equity inside report
+    rate of return calculations

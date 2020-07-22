@@ -83,13 +83,13 @@ class Portfolio:
         market_shares = 0
         for trans in self.history:
             market_shares = market_shares + trans.get_value() / self.context[index][trans.date]
-        return market_shares * self.context[index][date.today()]
+        return round(market_shares * self.context[index][date.today()], 3)
 
     def calc_rate_of_return(self):
-        return opt.fsolve(lambda rate: self.value_diff(rate), 1)[0]
+        return round(opt.fsolve(lambda rate: self.value_diff(rate), 1)[0], 3)
     
     def calc_market_rate_of_return(self, index="^GSPC"):
-        return opt.fsolve(lambda rate: self.value_diff(rate, index), 1)[0]
+        return round(opt.fsolve(lambda rate: self.value_diff(rate, index), 1)[0], 3)
 
     def value_diff(self, rate, index=None):
         value = 0
