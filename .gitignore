@@ -6,3 +6,5 @@
 *.pkl
 *.log
 
+pytrade/__pycache__/data.cpython-37.pyc
+latest.pkl
