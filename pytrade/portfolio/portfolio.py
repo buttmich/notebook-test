@@ -1,5 +1,5 @@
 from .stock import Stock
-from .transaction import DepositTransaction, StockTransaction, TransactionType
+from .transaction import DepositTransaction, StockTransaction, DividendTransaction, TransactionType
 import pickle
 from datetime import date
 import scipy.optimize as opt
@@ -72,18 +72,34 @@ class Portfolio:
         self.history.append(transaction)
         self.log(transaction)
 
+    @autosave
+    def dividend(self, ticker, amount, ex_dividend_date, trans_date=date.today()):
+        dividend_stock = next((s for s in self.stocks if s.ticker == ticker), None)
+        if dividend_stock is not None:
+            self.buy_power = self.buy_power + amount
+            dividend_per_share = amount / dividend_stock.num_shares
+            pre_dividend_close = self.context["Close"][ticker][self.context.index.get_loc(ex_dividend_date)-1]
+            adj_factor = 1 - dividend_per_share / pre_dividend_close
+            dividend_stock.avg_cost = dividend_stock.avg_cost * adj_factor
+        else:
+            raise ValueError("Cannot get dividend on stock that you don't own")
+
+        transaction = DividendTransaction(trans_date, TransactionType.DIVIDEND, amount, ticker)
+        self.history.append(transaction)
+        self.log(transaction)    
+
     def current_value(self):
         stock_value = 0
         for s in self.stocks:
-            price = self.context[s.ticker].iloc[-1]
+            price = self.context["Adj Close"][s.ticker].iloc[-1]
             stock_value = stock_value + price * s.num_shares
         return round(stock_value + self.buy_power, 3)
 
     def market_current_value(self, index="^GSPC"):
         market_shares = 0
         for trans in self.history:
-            market_shares = market_shares + trans.get_value() / self.context[index][trans.date]
-        return round(market_shares * self.context[index][date.today()], 3)
+            market_shares = market_shares + trans.get_deposit() / self.context["Adj Close"][index][trans.date]
+        return round(market_shares * self.context["Adj Close"][index][date.today()], 3)
 
     def calc_rate_of_return(self):
         return round(opt.fsolve(lambda rate: self.value_diff(rate), 1)[0], 3)
@@ -94,16 +110,17 @@ class Portfolio:
     def value_diff(self, rate, index=None):
         value = 0
         for trans in self.history:
-            value = value + trans.get_value() * (rate ** ((date.today() - trans.date).days / 365))
+            value = value + trans.get_deposit() * (rate ** ((date.today() - trans.date).days / 365))
         return value - (self.current_value() if index is None else self.market_current_value(index))
     
     def report(self):
         print(f"Current Value = {self.current_value()}")
         print(f"Buy Power = {round(self.buy_power, 3)}")
         print("-" * 30)
-        self.stocks.sort(key = lambda x : x.num_shares * self.context[x.ticker].iloc[-1], reverse = True)
+        self.stocks.sort(key = lambda x : x.num_shares * self.context["Adj Close"][x.ticker].iloc[-1], reverse = True)
         for s in self.stocks:
-            print(f"{s} {round(self.context[s.ticker].iloc[-1], 3)}")
+            current_value = round(self.context["Adj Close"][s.ticker].iloc[-1], 3)
+            print(f"{s} {current_value}")
 
     def save(self):
         filename = f"{self.name}.pkl"

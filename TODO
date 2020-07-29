@@ -1,5 +1,4 @@
 Potential improvements
-    how do we do dividends? and adj close...? (probably involves context objectification)
     Find way to only get 2y of dividends
     Include latest value for stock (Michael)
     Simulation module
@@ -23,7 +22,7 @@ Potential improvements
     
 
 In Progress
-    
+    how do we do dividends? and adj close...? (probably involves context objectification)
     
     
 Completed Work
@@ -34,3 +33,18 @@ Completed Work
     Datetime logging
     show current value of each equity inside report
     rate of return calculations
+    
+Analysis Versions
+    1.0: Simple stochastic 1Y-3M and 1Y-3W for long and short-term respectively using adj close
+        1.0.0: Simple sort by 1Y-3*. Sell when below average/median
+        1.0.1: Sell when 1Y-3* negative
+        1.0.2: Sell short-term when 0, or long-term when held for more than 1Y
+    1.1: Implemented potential in metric calculations
+        1.1.0: Percentage off maximum multiplied by constant factor and added to 1Y-3* to define metric
+        1.1.1: Percentage off maximum replaced by potential to reach "equilibrium" value.
+        1.1.2: % off equilibrium multiplied by variable and added to 1Y-3* such that top of the list was 100%
+        
+        
+Analysis Ideas
+    Rolling x-day average to reduce variability in closing prices
+    Use dividend and closing price instead of adjusted close so make compatible with future simulation methods

@@ -4,14 +4,14 @@ class TransactionType(Enum):
     BUY = "BUY"
     SELL = "SELL"
     DEPOSIT = "DEPOSIT"
-    # Dividens are hard.
+    DIVIDEND = "DIVIDEND"
 
 class Transaction:
     def __init__(self, date, transaction_type):
         self.date = date
         self.type = transaction_type # Transaction Type
 
-    def get_value(self):
+    def get_deposit(self):
         raise NotImplementedError("Not implemented in base class") # defined in child class
 
     def __str__(self):
@@ -25,7 +25,7 @@ class StockTransaction(Transaction):
         Transaction.__init__(self, date, transaction_type)
         self.stock = stock
 
-    def get_value(self):
+    def get_deposit(self):
         return 0
 
     def __str__(self):
@@ -38,15 +38,23 @@ class DepositTransaction(Transaction):
         Transaction.__init__(self, date, transaction_type)
         self.value = value
 
-    def get_value(self):
+    def get_deposit(self):
         return self.value
 
     def __str__(self):
         return f"{self.type.name} {self.date} {self.value}"
     
 
-# class DividendTransaction(Transaction):
-#     def __init__(self, fname, lname):
-#         Transaction.__init__(self, fname, lname)
-#         self.stock
-#         self.value
+class DividendTransaction(Transaction):
+    def __init__(self, date, transaction_type, amount, ticker):
+        if transaction_type != TransactionType.DIVIDEND:
+            raise ValueError("Bad Transaction type")
+        Transaction.__init__(self, date, transaction_type)
+        self.dividend = amount
+        self.ticker = ticker
+
+    def get_deposit(self):
+        return 0
+
+    def __str__(self):
+        return f"{self.type.name} {self.date} {self.ticker} {self.dividend}"
