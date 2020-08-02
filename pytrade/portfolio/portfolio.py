@@ -163,7 +163,7 @@ class Portfolio:
         market_shares = 0
         for trans in self.history:
             market_shares = market_shares + trans.get_deposit() / self.context["Adj Close"][index][trans.date]
-        return round(market_shares * self.context["Adj Close"][index][date.today()], 3)
+        return round(market_shares * self.context["Adj Close"][index][date.index.iloc[-1]], 3)
 
     def calc_rate_of_return(self):
         """Calculates rate of return using an optimization package.
