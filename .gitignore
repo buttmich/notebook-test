@@ -6,5 +6,7 @@
 *.pkl
 *.log
 
-pytrade/__pycache__/data.cpython-37.pyc
+__pycache__/
+*.py[cod]
+
 latest.pkl
