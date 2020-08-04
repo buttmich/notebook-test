@@ -2,10 +2,10 @@ import pandas as pd
 import datetime
 import numpy as np
 
-def run(ratios):
-    three_wk_mask = datetime.date.today()-ratios.index.date <= datetime.timedelta(days=21)
-    three_m_mask = datetime.date.today()-ratios.index.date <= datetime.timedelta(days=91)
-    one_yr_mask = datetime.date.today()-ratios.index.date <= datetime.timedelta(days=365)
+def run(ratios, analysis_date=datetime.date.today()):
+    three_wk_mask = analysis_date-ratios.index.date <= datetime.timedelta(days=21)
+    three_m_mask = analysis_date-ratios.index.date <= datetime.timedelta(days=91)
+    one_yr_mask = analysis_date-ratios.index.date <= datetime.timedelta(days=365)
     #st_multiplier = 2
 
     # Format Analysis

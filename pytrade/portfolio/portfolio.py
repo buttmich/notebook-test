@@ -96,12 +96,38 @@ class Portfolio:
         """
         stock_to_sell = next((s for s in self.stocks if s.ticker == ticker), None)
         if stock_to_sell is not None:
-            if stock_to_sell.num_shares - num_shares >= 0:
+            if round(stock_to_sell.num_shares - num_shares, 3) >= 0:
                 stock_to_sell.num_shares = stock_to_sell.num_shares - num_shares
             else:
                 raise ValueError("Cannot sell more stock than you own")
-            if stock_to_sell.num_shares == 0:
+            if round(stock_to_sell.num_shares, 3) == 0:
                 self.stocks.remove(stock_to_sell)
+            self.buy_power = self.buy_power + total_price
+        else:
+            raise ValueError("Cannot sell stock that you don't own")
+
+        sold_stock = Stock(ticker, num_shares, total_price)
+        transaction = StockTransaction(trans_date, TransactionType.SELL, sold_stock)
+        self.history.append(transaction)
+        self.log(transaction)
+
+    @autosave
+    def sell_all(self, ticker, total_price, trans_date=date.today()):
+        """[summary]
+
+        Args:
+            ticker ([type]): [description]
+            total_price ([type]): [description]
+            trans_date ([type], optional): [description]. Defaults to date.today().
+
+        Raises:
+            ValueError: [description]
+        """
+        num_shares = self.get_numshares(ticker)
+        stock_to_sell = next((s for s in self.stocks if s.ticker == ticker), None)
+        if stock_to_sell is not None:
+            stock_to_sell.num_shares = 0
+            self.stocks.remove(stock_to_sell)
             self.buy_power = self.buy_power + total_price
         else:
             raise ValueError("Cannot sell stock that you don't own")
@@ -138,6 +164,15 @@ class Portfolio:
         self.history.append(transaction)
         self.log(transaction)    
 
+    def get_numshares(self, ticker):
+        """[summary]
+
+        Returns:
+            [type]: [description]
+        """
+        stock = next((s for s in self.stocks if s.ticker == ticker), None)
+        return stock.num_shares
+
     def current_value(self):
         """Calculates the current value of a portfolio by looking up lastes prices for the stocks in the stock list.
 
@@ -163,7 +198,7 @@ class Portfolio:
         market_shares = 0
         for trans in self.history:
             market_shares = market_shares + trans.get_deposit() / self.context["Adj Close"][index][trans.date]
-        return round(market_shares * self.context["Adj Close"][index][date.index.iloc[-1]], 3)
+        return round(market_shares * self.context["Adj Close"][index].iloc[-1], 3)
 
     def calc_rate_of_return(self):
         """Calculates rate of return using an optimization package.

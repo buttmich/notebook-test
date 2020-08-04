@@ -20,6 +20,8 @@ Potential improvements
     Realized/Unrealized gains
     Tax handling
     
+    Having to recalculate ratios in every iteration of simulation
+    
 
 In Progress
     how do we do dividends? and adj close...? (probably involves context objectification)

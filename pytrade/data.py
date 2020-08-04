@@ -2,7 +2,7 @@ import pandas as pd
 import yfinance as yf
 
 
-def get_data(period="2y", reload=True):
+def get_data(period="5y", reload=True):
     """
     """
     df_close = None

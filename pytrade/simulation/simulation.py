@@ -15,6 +15,7 @@ class Simulation:
             context: (Dataframe): Full data set for simulation
         """
         self.name = name
+        # rename simulation buy power
         self.buy_power = buy_power
         self.strategy = strategy
         self.start_date = start_date
@@ -35,16 +36,25 @@ class Simulation:
             # Update portfolio context with new date's data
             current_date_mask = current_date >= self.context.index.date
             self._portfolio.context = pd.DataFrame(self.context[current_date_mask])
+            to_sell = self.strategy.to_sell(self._portfolio)
+            for stock in to_sell:
+                name = stock[0]
+                percentage = stock[1]
+                num_shares = self._portfolio.get_numshares(name) * percentage
+                total_price = self._portfolio.context["Close"][name].iloc[-1] * num_shares
+                self._portfolio.sell(name, num_shares, total_price, current_date)
 
-            # Apply strategy actions / transactions
+            # Add dividend logic
 
-                #Check to see if stocks need to be sold
-                    
-                    # Sell off stocks based on strategy
-                
-                # Update buy power (dividends/new deposit)
-                
-                # Buy new stocks
+            if round(self._portfolio.buy_power, 3) != 0:
+                to_buy = self.strategy.to_buy(self._portfolio)
+                for stock in to_buy:
+                    name = stock[0]
+                    percentage = stock[1]
+                    price = self._portfolio.context["Close"][name].iloc[-1]
+                    num_shares = (self._portfolio.buy_power / price) * percentage
+                    self._portfolio.buy(name, num_shares, self._portfolio.buy_power * percentage, current_date)
+
             if len(self.context.index) <= (self.context.index.get_loc(current_date) + 1):
                 break
             current_date = self.context.index[self.context.index.get_loc(current_date) + 1]
@@ -67,7 +77,7 @@ class Simulation:
             percentage = stock[1]
             price = self._portfolio.context["Close"][name].iloc[-1]
             num_shares = (self.buy_power / price) * percentage
-            self._portfolio.buy(name, num_shares, self.buy_power * percentage)
+            self._portfolio.buy(name, num_shares, self.buy_power * percentage, self.start_date)
 
         print("Finished Initialization")
         print(self._portfolio.report())
