@@ -48,12 +48,13 @@ class Simulation:
 
             if round(self._portfolio.buy_power, 3) != 0:
                 to_buy = self.strategy.to_buy(self._portfolio)
+                amount_buy = self._portfolio.buy_power
                 for stock in to_buy:
                     name = stock[0]
                     percentage = stock[1]
                     price = self._portfolio.context["Close"][name].iloc[-1]
-                    num_shares = (self._portfolio.buy_power / price) * percentage
-                    self._portfolio.buy(name, num_shares, self._portfolio.buy_power * percentage, current_date)
+                    num_shares = (amount_buy / price) * percentage
+                    self._portfolio.buy(name, num_shares, amount_buy * percentage, current_date)
 
             if len(self.context.index) <= (self.context.index.get_loc(current_date) + 1):
                 break

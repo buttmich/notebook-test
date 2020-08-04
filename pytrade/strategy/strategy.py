@@ -52,15 +52,18 @@ class Utkarsh_v1_short(Strategy):
         metric = self.analysis(portfolio.context["Adj Close"], start_date)
         metric.sort_values(by="metric",ascending=False,inplace=True)
         
-        return [(metric.index[0], 1)]
+        return [(metric.index[0], 13/32), (metric.index[1], 8/32), (metric.index[2], 5/32), (metric.index[3], 3/32), \
+            (metric.index[4], 2/32), (metric.index[5], 1/32)]
     
     def to_buy(self, portfolio):
         # Look at result of analysis to determine what to buy
         start_date = portfolio.context.index.date[-1]
         metric = self.analysis(portfolio.context["Adj Close"], start_date)
         metric.sort_values(by="metric",ascending=False,inplace=True)
-        
-        return [(metric.index[0], 1)]
+        if portfolio.buy_power > portfolio.max_holding():
+            return [(metric.index[0], 2/3), (metric.index[1], 1/3)]
+        else:
+            return [(metric.index[0], 1)]
 
     def to_sell(self, portfolio):
         # Look at result of analysis to determine what to sell
@@ -68,7 +71,7 @@ class Utkarsh_v1_short(Strategy):
         metric = self.analysis(portfolio.context["Adj Close"], current_date)
         sell_list = []
         for stock in portfolio.stocks:
-            if round(metric["metric"][stock.ticker], 3) < 0:
+            if round(metric["metric"][stock.ticker], 3) <= 0:
                 sell_list.append((stock.ticker, 1))
         return sell_list
 
