@@ -4,7 +4,7 @@ from ..portfolio import Portfolio
 import pandas as pd
 
 class Simulation:
-    def __init__(self, context, buy_power, strategy, start_date, name="", end_date = datetime.date.today()):
+    def __init__(self, context, buy_power, strategy, start_date, end_date = datetime.date.today(), name=""):
         """Simulation initialization
 
         Args:
@@ -32,7 +32,7 @@ class Simulation:
 
         # Run Simulation
         while(current_date <= self.end_date):
-            print(current_date)
+            # print(current_date)
             # Update portfolio context with new date's data
             current_date_mask = current_date >= self.context.index.date
             self._portfolio.context = pd.DataFrame(self.context[current_date_mask])
@@ -41,7 +41,7 @@ class Simulation:
                 name = stock[0]
                 percentage = stock[1]
                 num_shares = self._portfolio.get_numshares(name) * percentage
-                total_price = self._portfolio.context["Close"][name].iloc[-1] * num_shares
+                total_price = self._portfolio.context["Adj Close"][name].iloc[-1] * num_shares
                 self._portfolio.sell(name, num_shares, total_price, current_date)
 
             # Add dividend logic
@@ -52,7 +52,7 @@ class Simulation:
                 for stock in to_buy:
                     name = stock[0]
                     percentage = stock[1]
-                    price = self._portfolio.context["Close"][name].iloc[-1]
+                    price = self._portfolio.context["Adj Close"][name].iloc[-1]
                     num_shares = (amount_buy / price) * percentage
                     self._portfolio.buy(name, num_shares, amount_buy * percentage, current_date)
 
@@ -66,7 +66,7 @@ class Simulation:
         # Do something with results.
     
     def initialize(self):
-        self._portfolio.deposit(self.buy_power)
+        self._portfolio.deposit(self.buy_power, self.start_date)
 
         start_date_mask = self.start_date >= self.context.index.date
         self._portfolio.context = pd.DataFrame(self.context[start_date_mask])
@@ -76,7 +76,7 @@ class Simulation:
         for stock in to_buy:
             name = stock[0]
             percentage = stock[1]
-            price = self._portfolio.context["Close"][name].iloc[-1]
+            price = self._portfolio.context["Adj Close"][name].iloc[-1]
             num_shares = (self.buy_power / price) * percentage
             self._portfolio.buy(name, num_shares, self.buy_power * percentage, self.start_date)
 

@@ -1,5 +1,6 @@
 Potential improvements
     Find way to only get 2y of dividends
+        Currently simulating with adjusted close. Should be okay in place of dividends
     Include latest value for stock (Michael)
     Simulation module
     
@@ -21,6 +22,10 @@ Potential improvements
     Tax handling
     
     Having to recalculate ratios in every iteration of simulation
+    
+    Report everyday portfolio value in simulation for plotting purposes
+    
+    None popping up on simulation report and gap in dates
     
 
 In Progress
